@@ -17,14 +17,14 @@
 package org.example.sample;
 
 import com.blazebit.persistence.CriteriaBuilder;
-import java.util.List;
 import org.example.model.Cat;
 import org.example.model.CatCte;
-import org.example.model.Person;
 import org.hibernate.Filter;
 import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.List;
 
 public class SampleTest extends AbstractSampleTest {
 
@@ -57,7 +57,25 @@ public class SampleTest extends AbstractSampleTest {
 
             System.out.println(cats);
 
-            Assert.assertEquals(2, cats.size());
+            Assert.assertEquals(0, cats.size());
         });
     }
+
+    @Test
+    public void testSizeWithFilter() {
+        transactional(em -> {
+
+            Session hibernateSession = em.unwrap(Session.class);
+            Filter filter = hibernateSession.enableFilter("genderFilter");
+            filter.setParameter("gender", "f");
+
+            CriteriaBuilder<Cat> cb = cbf.create(em, Cat.class);
+            cb.from(Cat.class, "cat");
+            cb.where("size(kittens)").gt(1);
+            List<Cat> parents = cb.getResultList();
+
+            Assert.assertTrue(parents.get(0).getKittens().size() > 1);
+        });
+    }
+
 }

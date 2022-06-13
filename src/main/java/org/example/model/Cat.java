@@ -20,18 +20,18 @@ import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.ParamDef;
 
-import java.util.HashSet;
-import java.util.Set;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
-@FilterDef(name = "genderFilter", parameters = @ParamDef(name = "gender", type = "java.lang.String"))
-@Filter(name = "genderFilter", condition = "gender = :gender")
+@FilterDef(name = "genderFilter", defaultCondition = "gender =:gender", parameters = @ParamDef(name = "gender", type = "java.lang.String"))
+@Filter(name = "genderFilter")
 public class Cat {
     
     @Id
@@ -47,6 +47,7 @@ public class Cat {
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     private Cat father;
     @ManyToMany
+    @Filter(name = "genderFilter")
     private Set<Cat> kittens = new HashSet<>();
 
     public Cat() {
